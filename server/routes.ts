@@ -170,6 +170,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             break;
 
+          case 'reset_buzzers':
+            if (ws.isAdmin && ws.sessionId) {
+              broadcastToSession(ws.sessionId, {
+                type: 'reset_buzzers'
+              });
+            }
+            break;
+
           case 'next_question':
             if (ws.isAdmin && ws.sessionId) {
               const session = await storage.getQuizSession(ws.sessionId);
