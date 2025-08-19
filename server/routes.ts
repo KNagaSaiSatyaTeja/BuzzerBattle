@@ -199,6 +199,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
             break;
+
+          case 'reset_buzzers':
+            if (ws.isAdmin && ws.sessionId) {
+              // Broadcast reset to all participants
+              broadcastToSession(ws.sessionId, {
+                type: 'reset_buzzers'
+              });
+            }
+            break;
         }
       } catch (error) {
         console.error('WebSocket message error:', error);
@@ -335,6 +344,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to get question results", error });
+    }
+  });
+
+  app.get("/api/participants/:participantId", async (req, res) => {
+    try {
+      const participant = await storage.getParticipant(req.params.participantId);
+      if (!participant) {
+        return res.status(404).json({ message: "Participant not found" });
+      }
+      res.json(participant);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get participant", error });
     }
   });
 

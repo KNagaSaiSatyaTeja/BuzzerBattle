@@ -440,8 +440,46 @@ export default function QuizDisplay() {
           <QuestionDisplay question={currentQuestion} />
         </div>
 
+        {/* Buzzer Order Display for Admin */}
+        {buzzerOrder.length > 0 && timerActive && (
+          <Card className="bg-white bg-opacity-10 backdrop-blur-sm mb-8">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">
+                <i className="fas fa-hand-paper mr-2"></i>Buzzer Order
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {buzzerOrder.map((buzz) => (
+                  <div
+                    key={buzz.participantId}
+                    className="bg-white bg-opacity-20 rounded-lg p-4 border border-white border-opacity-30"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                          buzz.buzzerOrder === 1 ? 'bg-quiz-blue text-white' :
+                          buzz.buzzerOrder === 2 ? 'bg-quiz-green text-white' :
+                          buzz.buzzerOrder === 3 ? 'bg-quiz-orange text-white' :
+                          'bg-gray-400 text-white'
+                        }`}>
+                          {buzz.buzzerOrder}
+                        </span>
+                        <span className="font-semibold text-white">
+                          {buzz.participant}
+                        </span>
+                      </div>
+                      <span className="text-sm text-white opacity-75">
+                        {(buzz.buzzerTime / 1000).toFixed(2)}s
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Admin Controls */}
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {!timerActive && !showResults && (
             <Button
               data-testid="button-start-timer"
@@ -459,6 +497,19 @@ export default function QuizDisplay() {
               className="bg-quiz-orange text-white px-6 py-3 font-semibold hover:bg-yellow-600 transition-colors"
             >
               <i className="fas fa-pause mr-2"></i>Pause Timer
+            </Button>
+          )}
+
+          {buzzerOrder.length > 0 && (
+            <Button
+              data-testid="button-reset-buzzers"
+              onClick={() => {
+                setBuzzerOrder([]);
+                sendMessage({ type: 'reset_buzzers' });
+              }}
+              className="bg-red-500 text-white px-6 py-3 font-semibold hover:bg-red-600 transition-colors"
+            >
+              <i className="fas fa-redo mr-2"></i>Reset Buzzers
             </Button>
           )}
 

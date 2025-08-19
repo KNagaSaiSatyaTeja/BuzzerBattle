@@ -72,6 +72,13 @@ export default function StudentBuzzer() {
           }
           break;
           
+        case 'reset_buzzers':
+          setBuzzerPressed(false);
+          setBuzzerOrder([]);
+          setCanAnswer(false);
+          setSelectedAnswer(null);
+          break;
+          
         case 'question_changed':
           setCurrentQuestionIndex(lastMessage.questionIndex);
           setBuzzerPressed(false);
@@ -173,6 +180,14 @@ export default function StudentBuzzer() {
           <Card className="shadow-lg border border-gray-100 mb-6">
             <CardContent className="p-8">
               <div className="text-center">
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-gray-700 mb-2">
+                    Press the buzzer to answer!
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    First to buzz gets to answer
+                  </p>
+                </div>
                 <BuzzerButton
                   onBuzz={handleBuzzer}
                   disabled={timeLeft <= 0}
@@ -242,19 +257,26 @@ export default function StudentBuzzer() {
 
         {/* Answer Selection */}
         {canAnswer && currentQuestion && (
-          <Card className="shadow-lg border border-gray-100 mb-6">
+          <Card className="shadow-lg border border-gray-100 mb-6 animate-pulse-slow border-quiz-blue">
             <CardContent className="p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Your turn! Select your answer:
-              </h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="bg-quiz-blue bg-opacity-10 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-center mb-2">
+                  <i className="fas fa-star text-quiz-blue text-2xl mr-2"></i>
+                  <h4 className="text-xl font-bold text-quiz-blue">Your Turn!</h4>
+                  <i className="fas fa-star text-quiz-blue text-2xl ml-2"></i>
+                </div>
+                <p className="text-center text-gray-700 font-medium">
+                  You buzzed first - select your answer:
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {(['A', 'B', 'C', 'D'] as const).map((option) => {
                   const options = currentQuestion.options as { A: string; B: string; C: string; D: string };
                   const colorClasses = {
-                    A: 'bg-quiz-blue hover:bg-blue-600',
-                    B: 'bg-quiz-green hover:bg-green-600',
-                    C: 'bg-quiz-orange hover:bg-yellow-600',
-                    D: 'bg-quiz-red hover:bg-red-600'
+                    A: 'bg-quiz-blue hover:bg-blue-600 shadow-lg',
+                    B: 'bg-quiz-green hover:bg-green-600 shadow-lg',
+                    C: 'bg-quiz-orange hover:bg-yellow-600 shadow-lg',
+                    D: 'bg-quiz-red hover:bg-red-600 shadow-lg'
                   };
                   
                   return (
@@ -262,9 +284,12 @@ export default function StudentBuzzer() {
                       key={option}
                       data-testid={`button-answer-${option.toLowerCase()}`}
                       onClick={() => handleAnswerSelect(option)}
-                      className={`${colorClasses[option]} text-white p-4 font-semibold transition-all`}
+                      className={`${colorClasses[option]} text-white p-4 font-semibold transition-all transform hover:scale-105 text-left`}
                     >
-                      {option}. {options[option]}
+                      <div className="flex items-start">
+                        <span className="font-bold text-xl mr-3 mt-1">{option}.</span>
+                        <span className="flex-1">{options[option]}</span>
+                      </div>
                     </Button>
                   );
                 })}
