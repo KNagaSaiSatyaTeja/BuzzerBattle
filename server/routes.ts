@@ -233,9 +233,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/sessions/:code", async (req, res) => {
+  app.get("/api/sessions/:sessionId", async (req, res) => {
     try {
-      const session = await storage.getQuizSessionByCode(req.params.code);
+      const { sessionId } = req.params;
+      // Try to get by ID first, then by code
+      let session = await storage.getQuizSession(sessionId);
+      
+      if (!session) {
+        session = await storage.getQuizSessionByCode(sessionId);
+      }
+      
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }

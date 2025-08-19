@@ -19,15 +19,28 @@ export default function QuizDisplay() {
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
   const [pollResults, setPollResults] = useState<{ A: number; B: number; C: number; D: number }>({ A: 0, B: 0, C: 0, D: 0 });
 
-  const { data: session } = useQuery<QuizSession>({
+  const { data: session, isLoading: sessionLoading, error: sessionError } = useQuery<QuizSession>({
     queryKey: ['/api/sessions', sessionId],
     enabled: !!sessionId,
   });
 
-  const { data: questions = [] } = useQuery<Question[]>({
+  const { data: questions = [], isLoading: questionsLoading, error: questionsError } = useQuery<Question[]>({
     queryKey: ['/api/sessions', sessionId, 'questions'],
     enabled: !!sessionId,
   });
+
+  // Add console logging for debugging
+  useEffect(() => {
+    console.log('Quiz Display Debug:', {
+      sessionId,
+      session,
+      sessionLoading,
+      sessionError,
+      questions: questions.length,
+      questionsLoading,
+      questionsError
+    });
+  }, [sessionId, session, sessionLoading, sessionError, questions, questionsLoading, questionsError]);
 
   const { data: participants = [] } = useQuery<Participant[]>({
     queryKey: ['/api/sessions', sessionId, 'participants'],
@@ -39,7 +52,12 @@ export default function QuizDisplay() {
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  const { data: currentQuestionResults } = useQuery({
+  const { data: currentQuestionResults } = useQuery<{
+    question: Question;
+    responses: any[];
+    pollResults: { A: number; B: number; C: number; D: number };
+    totalResponses: number;
+  }>({
     queryKey: ['/api/questions', currentQuestion?.id, 'results'],
     enabled: !!currentQuestion?.id && showResults,
     refetchInterval: 1000,
@@ -124,12 +142,25 @@ export default function QuizDisplay() {
     });
   };
 
-  if (!session || !currentQuestion) {
+  if (!session || questions.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-white">
         <div className="text-center">
           <i className="fas fa-spinner fa-spin text-4xl mb-4"></i>
           <p className="text-xl">Loading quiz...</p>
+          {sessionId && <p className="text-sm mt-2 opacity-75">Session ID: {sessionId}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-white">
+        <div className="text-center">
+          <i className="fas fa-exclamation-triangle text-4xl mb-4 text-yellow-500"></i>
+          <p className="text-xl">No questions found</p>
+          <p className="text-sm mt-2 opacity-75">Please add questions to this quiz session</p>
         </div>
       </div>
     );
