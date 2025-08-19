@@ -157,17 +157,25 @@ export default function StudentBuzzer() {
         <Card className="shadow-lg border border-gray-100 mb-6">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="bg-gray-100 rounded-xl p-4 mb-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </h3>
-                {timeLeft > 0 && (
-                  <div className="flex items-center justify-center space-x-2">
-                    <i className="fas fa-clock text-quiz-orange"></i>
-                    <span className="text-lg font-bold text-quiz-orange" data-testid="text-time-remaining">
+                {timeLeft > 0 ? (
+                  <div className="flex items-center justify-center space-x-3">
+                    <i className={`fas fa-clock ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-quiz-orange'}`}></i>
+                    <span className={`text-2xl font-bold ${timeLeft <= 10 ? 'text-red-500' : 'text-quiz-orange'}`} data-testid="text-time-remaining">
                       {timeLeft}
                     </span>
-                    <span className="text-gray-600">seconds remaining</span>
+                    <span className="text-gray-700 font-medium">seconds left</span>
+                  </div>
+                ) : timeLeft === 0 ? (
+                  <div className="text-red-500 font-bold text-lg">
+                    <i className="fas fa-clock mr-2"></i>Time's Up!
+                  </div>
+                ) : (
+                  <div className="text-gray-500">
+                    <i className="fas fa-pause mr-2"></i>Waiting for timer...
                   </div>
                 )}
               </div>
@@ -200,15 +208,39 @@ export default function StudentBuzzer() {
 
         {/* Buzzer Status */}
         {buzzerPressed && myBuzzerPosition && (
-          <Card className="shadow-lg border border-gray-100 mb-6">
+          <Card className="shadow-lg border border-gray-100 mb-6 animate-pulse">
             <CardContent className="p-6">
               <div className="text-center">
-                <div className="bg-quiz-blue bg-opacity-10 rounded-xl p-4">
-                  <i className="fas fa-check-circle text-quiz-blue text-3xl mb-2"></i>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Buzzed In!</h3>
-                  <p className="text-gray-600">
-                    You're #{myBuzzerPosition.buzzerOrder} - {(myBuzzerPosition.buzzerTime / 1000).toFixed(2)}s
+                <div className={`rounded-xl p-6 ${
+                  myBuzzerPosition.buzzerOrder === 1 ? 'bg-green-100 border-2 border-green-300' :
+                  myBuzzerPosition.buzzerOrder === 2 ? 'bg-blue-100 border-2 border-blue-300' :
+                  myBuzzerPosition.buzzerOrder === 3 ? 'bg-orange-100 border-2 border-orange-300' :
+                  'bg-gray-100 border-2 border-gray-300'
+                }`}>
+                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-3 ${
+                    myBuzzerPosition.buzzerOrder === 1 ? 'bg-green-500' :
+                    myBuzzerPosition.buzzerOrder === 2 ? 'bg-blue-500' :
+                    myBuzzerPosition.buzzerOrder === 3 ? 'bg-orange-500' :
+                    'bg-gray-500'
+                  }`}>
+                    <span className="text-3xl font-bold text-white">
+                      {myBuzzerPosition.buzzerOrder}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {myBuzzerPosition.buzzerOrder === 1 ? '🎉 First to Buzz!' :
+                     myBuzzerPosition.buzzerOrder === 2 ? 'Second Place!' :
+                     myBuzzerPosition.buzzerOrder === 3 ? 'Third Place!' :
+                     'Buzzed In!'}
+                  </h3>
+                  <p className="text-lg text-gray-700 font-semibold">
+                    Response time: {(myBuzzerPosition.buzzerTime / 1000).toFixed(2)}s
                   </p>
+                  {myBuzzerPosition.buzzerOrder === 1 && (
+                    <p className="text-green-600 font-bold mt-2">
+                      🏆 You get to answer first!
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -255,6 +287,28 @@ export default function StudentBuzzer() {
           </Card>
         )}
 
+        {/* Waiting to Answer */}
+        {buzzerPressed && !canAnswer && !selectedAnswer && myBuzzerPosition && myBuzzerPosition.buzzerOrder > 1 && (
+          <Card className="shadow-lg border border-gray-100 mb-6">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="bg-yellow-100 border-2 border-yellow-300 rounded-xl p-6">
+                  <i className="fas fa-hourglass-half text-yellow-600 text-4xl mb-3 animate-spin"></i>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Waiting Your Turn
+                  </h3>
+                  <p className="text-gray-700">
+                    Player in position #{myBuzzerPosition.buzzerOrder - 1} is answering...
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    You'll get your chance if they get it wrong!
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Answer Selection */}
         {canAnswer && currentQuestion && (
           <Card className="shadow-lg border border-gray-100 mb-6 animate-pulse-slow border-quiz-blue">
@@ -269,7 +323,7 @@ export default function StudentBuzzer() {
                   You buzzed first - select your answer:
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-4">
                 {(['A', 'B', 'C', 'D'] as const).map((option) => {
                   const options = currentQuestion.options as { A: string; B: string; C: string; D: string };
                   const colorClasses = {
@@ -284,7 +338,7 @@ export default function StudentBuzzer() {
                       key={option}
                       data-testid={`button-answer-${option.toLowerCase()}`}
                       onClick={() => handleAnswerSelect(option)}
-                      className={`${colorClasses[option]} text-white p-4 font-semibold transition-all transform hover:scale-105 text-left`}
+                      className={`${colorClasses[option]} text-white p-6 font-bold text-lg transition-all transform hover:scale-105 active:scale-95 text-left`}
                     >
                       <div className="flex items-start">
                         <span className="font-bold text-xl mr-3 mt-1">{option}.</span>
@@ -316,12 +370,21 @@ export default function StudentBuzzer() {
         )}
 
         {/* Score Display */}
-        <Card className="shadow-lg border border-gray-100">
+        <Card className="shadow-lg border border-gray-100 bg-gradient-to-br from-blue-50 to-purple-50">
           <CardContent className="p-6">
             <div className="text-center">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Your Score</h4>
-              <div className="text-3xl font-bold text-quiz-blue" data-testid="text-participant-score">
-                {participant.score} points
+              <div className="flex items-center justify-center mb-3">
+                <i className="fas fa-star text-yellow-500 text-2xl mr-2"></i>
+                <h4 className="text-xl font-bold text-gray-900">Your Score</h4>
+                <i className="fas fa-star text-yellow-500 text-2xl ml-2"></i>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-inner">
+                <div className="text-4xl font-black text-quiz-blue mb-1" data-testid="text-participant-score">
+                  {participant.score}
+                </div>
+                <div className="text-lg font-semibold text-gray-600">
+                  {participant.score === 1 ? 'point' : 'points'}
+                </div>
               </div>
             </div>
           </CardContent>

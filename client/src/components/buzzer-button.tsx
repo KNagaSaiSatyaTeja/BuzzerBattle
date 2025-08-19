@@ -36,20 +36,22 @@ export function BuzzerButton({ onBuzz, disabled = false, buzzed = false }: Buzze
       onClick={handleBuzz}
       disabled={disabled || buzzed}
       className={`
-        w-64 h-64 rounded-full text-4xl font-bold shadow-2xl transition-all transform
+        w-64 h-64 rounded-full text-4xl font-bold shadow-2xl transition-all duration-200 transform
         ${buzzed 
-          ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
+          ? 'bg-green-500 hover:bg-green-500 cursor-not-allowed border-4 border-green-300' 
           : disabled 
             ? 'bg-gray-300 hover:bg-gray-300 cursor-not-allowed'
-            : 'bg-gradient-to-br from-quiz-red to-red-600 hover:from-red-600 hover:to-red-700 hover:scale-105'
+            : 'bg-gradient-to-br from-quiz-red to-red-600 hover:from-red-500 hover:to-red-600 hover:scale-110 active:scale-95 border-4 border-red-400'
         }
-        ${isPressed ? 'scale-95' : ''}
-        ${!disabled && !buzzed ? 'animate-pulse-slow' : ''}
+        ${isPressed ? 'scale-90 bg-red-700' : ''}
+        ${!disabled && !buzzed ? 'animate-pulse' : ''}
       `}
     >
-      <div className="flex flex-col items-center text-white">
-        <i className="fas fa-hand-paper text-6xl mb-2"></i>
-        <span>{buzzed ? 'BUZZED!' : 'BUZZ!'}</span>
+      <div className="flex flex-col items-center text-white drop-shadow-lg">
+        <i className={`${buzzed ? 'fas fa-check-circle' : 'fas fa-hand-paper'} text-6xl mb-2 transition-all duration-200`}></i>
+        <span className="text-xl font-black">
+          {buzzed ? 'BUZZED!' : 'BUZZ!'}
+        </span>
       </div>
     </Button>
   );
