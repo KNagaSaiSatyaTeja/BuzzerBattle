@@ -10,6 +10,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { QuizSession, Question, Participant } from "@shared/schema";
+import QRCode from "qrcode";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
   ]);
   
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: any) => {
@@ -57,6 +59,7 @@ export default function AdminDashboard() {
     onSuccess: (session: QuizSession) => {
       setSessionCode(session.code);
       setSessionId(session.id);
+      generateQRCode(session.code);
       toast({
         title: "Quiz session created!",
         description: `Session code: ${session.code}`,
@@ -80,6 +83,23 @@ export default function AdminDashboard() {
   const generateCode = () => {
     const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     setSessionCode(newCode);
+  };
+
+  const generateQRCode = async (code: string) => {
+    try {
+      const joinUrl = `${window.location.origin}/join?code=${code}`;
+      const qrDataUrl = await QRCode.toDataURL(joinUrl, {
+        width: 128,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      });
+      setQrCodeUrl(qrDataUrl);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
   };
 
   const handleStartQuiz = async () => {
@@ -323,14 +343,25 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                {/* QR Code placeholder */}
+                {/* QR Code */}
                 <Card>
                   <CardContent className="p-6 text-center">
                     <h4 className="text-lg font-semibold text-gray-900 mb-4">Quick Join</h4>
-                    <div className="w-32 h-32 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center border-2 border-dashed border-gray-300">
-                      <i className="fas fa-qrcode text-4xl text-gray-400"></i>
+                    <div className="w-32 h-32 bg-white rounded-lg mx-auto mb-4 flex items-center justify-center border border-gray-200">
+                      {qrCodeUrl ? (
+                        <img 
+                          src={qrCodeUrl} 
+                          alt="QR Code for joining quiz" 
+                          className="w-full h-full object-contain"
+                          data-testid="qr-code-image"
+                        />
+                      ) : (
+                        <i className="fas fa-qrcode text-4xl text-gray-400"></i>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-600">Students can scan this QR code to join</p>
+                    <p className="text-sm text-gray-600">
+                      {sessionCode ? `Scan to join with code: ${sessionCode}` : "Students can scan this QR code to join"}
+                    </p>
                   </CardContent>
                 </Card>
 

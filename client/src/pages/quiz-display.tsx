@@ -113,7 +113,10 @@ export default function QuizDisplay() {
   };
 
   const showLeaderboardHandler = () => {
-    setShowLeaderboard(true);
+    if (sessionId) {
+      // Navigate to dedicated leaderboard page
+      window.location.href = `/leaderboard/${sessionId}`;
+    }
   };
 
   const nextQuestion = () => {
@@ -319,6 +322,7 @@ export default function QuizDisplay() {
                 <Button
                   onClick={showLeaderboardHandler}
                   className="bg-quiz-purple text-white px-6 py-3 font-semibold hover:bg-purple-600 transition-colors"
+                  data-testid="button-show-leaderboard"
                 >
                   <i className="fas fa-trophy mr-2"></i>Show Leaderboard
                 </Button>

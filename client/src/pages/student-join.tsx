@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,15 @@ export default function StudentJoin() {
   
   const [joinCode, setJoinCode] = useState("");
   const [studentName, setStudentName] = useState("");
+
+  // Check for QR code URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('code');
+    if (codeFromUrl) {
+      setJoinCode(codeFromUrl.toUpperCase());
+    }
+  }, []);
 
   const joinQuizMutation = useMutation({
     mutationFn: async ({ code, name }: { code: string; name: string }) => {
