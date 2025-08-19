@@ -38,6 +38,9 @@ export class MemStorage implements IStorage {
     const session: QuizSession = {
       ...insertSession,
       id,
+      status: insertSession.status || "waiting",
+      timerDuration: insertSession.timerDuration || 30,
+      currentQuestionIndex: insertSession.currentQuestionIndex || 0,
       createdAt: new Date(),
     };
     this.quizSessions.set(id, session);
@@ -66,6 +69,8 @@ export class MemStorage implements IStorage {
     const question: Question = {
       ...insertQuestion,
       id,
+      imageUrl: insertQuestion.imageUrl || null,
+      audioUrl: insertQuestion.audioUrl || null,
     };
     this.questions.set(id, question);
     return question;
@@ -117,6 +122,11 @@ export class MemStorage implements IStorage {
     const response: Response = {
       ...insertResponse,
       id,
+      answer: insertResponse.answer || null,
+      buzzerOrder: insertResponse.buzzerOrder || null,
+      buzzerTime: insertResponse.buzzerTime || null,
+      isCorrect: insertResponse.isCorrect || null,
+      pointsAwarded: insertResponse.pointsAwarded || 0,
       respondedAt: new Date(),
     };
     this.responses.set(id, response);

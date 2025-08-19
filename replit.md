@@ -4,6 +4,17 @@
 
 This is a real-time quiz application designed for interactive classroom engagement. The system enables instructors to create and manage live quiz sessions while students participate using buzzer-style interactions and multiple-choice answers. Built as a full-stack web application, it features real-time synchronization between admin dashboards and student interfaces, supporting both individual and team-based quiz modes.
 
+**Key Features:**
+- Full-screen quiz display with question presentation
+- Real-time buzzer system with order tracking
+- Live poll results with answer distribution charts
+- Dynamic leaderboard with podium rankings
+- Correct answer reveals after each question
+- Admin controls for timer management (30/60/90 seconds)
+- Support for text, image, and audio questions
+- Individual and team play modes
+- Session codes for easy student joining
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

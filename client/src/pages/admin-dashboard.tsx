@@ -71,7 +71,7 @@ export default function AdminDashboard() {
     }
   });
 
-  const { data: participants = [] } = useQuery({
+  const { data: participants = [] } = useQuery<Participant[]>({
     queryKey: ['/api/sessions', sessionId, 'participants'],
     enabled: !!sessionId,
     refetchInterval: 2000, // Poll every 2 seconds

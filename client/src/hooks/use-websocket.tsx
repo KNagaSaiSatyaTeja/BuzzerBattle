@@ -27,13 +27,15 @@ export function useWebSocket(sessionId?: string, participantId?: string, isAdmin
 
     ws.onopen = () => {
       setIsConnected(true);
-      // Join the session
-      sendMessage({
-        type: 'join_session',
-        sessionId,
-        participantId,
-        isAdmin
-      });
+      // Join the session immediately after connection
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'join_session',
+          sessionId,
+          participantId,
+          isAdmin
+        }));
+      }
     };
 
     ws.onmessage = (event) => {
