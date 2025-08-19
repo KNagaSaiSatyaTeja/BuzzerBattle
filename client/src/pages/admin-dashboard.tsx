@@ -160,6 +160,12 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-bold text-gray-900">QuizBuzz</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => window.open("/student", "_blank")}
+                className="text-quiz-purple hover:text-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                <i className="fas fa-graduation-cap mr-2"></i>Student Portal
+              </button>
               <button className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                 <i className="fas fa-cog mr-2"></i>Settings
               </button>
